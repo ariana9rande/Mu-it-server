@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Mu:it
+
+  profiles:
+    # local, dev
+    active: local
+
+  jpa:
+    show-sql: true
+
+#logging:
+#  level: info
