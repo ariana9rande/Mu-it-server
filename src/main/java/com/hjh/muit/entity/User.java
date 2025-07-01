@@ -35,18 +35,18 @@ public class User extends BaseEntity {
     private String address;
 
     @Column
-    private Role role;
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
     @Column
-    private Grade grade;
+    private UserGrade grade;
 
     @OneToMany(mappedBy = "user")
     @Column
     private List<Order> orders;
 
     @Getter
-    public enum Grade {
+    public enum UserGrade {
 
         BRONZE(3),
         SILVER(5),
@@ -55,12 +55,12 @@ public class User extends BaseEntity {
 
         private final int discountRate;
 
-        Grade(int discountRate) {
+        UserGrade(int discountRate) {
             this.discountRate = discountRate;
         }
     }
 
-    public enum Role {
+    public enum UserRole {
         ADMIN,
         USER
     }
