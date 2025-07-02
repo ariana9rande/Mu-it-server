@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,10 @@ import java.io.UnsupportedEncodingException;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     // 인증번호 전송 API
     @PostMapping("/email/send")
@@ -45,7 +43,7 @@ public class AuthController {
         )
     )
     public String sendEmail(@org.springframework.web.bind.annotation.RequestBody @Email String email) throws MessagingException, UnsupportedEncodingException {
-        authService.sendEmail(email);
+        authService.sendCodeEmail(email);
 
         return "인증번호가 전송되었습니다.";
     }
@@ -59,7 +57,7 @@ public class AuthController {
         )
     )
     public ResponseEntity<ApiResponseDto> verifyEmail(@Valid @org.springframework.web.bind.annotation.RequestBody EmailVerifyRequestDto req) {
-        AuthResult result = authService.verifyEmailCode(req.getEmail(), req.getCode());
+        AuthResult result = authService.verifyCodeEmail(req.getEmail(), req.getCode());
         log.info("email = {}, code = {}", req.getEmail(), req.getCode());
 
         return switch(result) {
@@ -73,7 +71,7 @@ public class AuthController {
                     .message("인증 코드 만료")
                     .build());
 
-            case INVALID -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponseDto.builder()
+            case INCORRECT -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponseDto.builder()
                     .code(HttpStatus.UNAUTHORIZED.value())
                     .message("인증 코드 불일치")
                     .build());

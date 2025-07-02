@@ -2,10 +2,7 @@ package com.hjh.muit.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -29,11 +26,12 @@ public class User extends BaseEntity {
     private String email;
 
     @Column
-    private String phoneNumber;
+    private String phone;
 
     @Column
     private String address;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private UserRole role;
 

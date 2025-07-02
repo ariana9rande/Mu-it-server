@@ -20,3 +20,9 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+    from: Mu:it
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
