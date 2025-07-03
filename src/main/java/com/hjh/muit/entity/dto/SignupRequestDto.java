@@ -20,4 +20,8 @@ public class SignupRequestDto {
     private String phone;
 
     private String address;
+
+    private String provider;
+
+    private String providerId;
 }

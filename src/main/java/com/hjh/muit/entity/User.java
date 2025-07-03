@@ -3,10 +3,12 @@ package com.hjh.muit.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @ToString
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String loginId;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false)
@@ -30,6 +32,15 @@ public class User extends BaseEntity {
 
     @Column
     private String address;
+
+    @Column
+    private String provider;
+
+    @Column
+    private String providerId;
+
+    @Column
+    private LocalDateTime lastLogin;
 
     @Enumerated(EnumType.STRING)
     @Column

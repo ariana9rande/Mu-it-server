@@ -11,14 +11,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -60,5 +63,11 @@ public class UserController {
         User user = userService.createUser(dto);
 
         return ResponseEntity.ok(ApiResponseDto.success("회원가입 성공", user.getLoginId()));
+    }
+
+    @GetMapping("/me")
+    public Map<String, Object> me(@AuthenticationPrincipal OAuth2User user) {
+        log.info("user = {}", user.getAttributes());
+        return user.getAttributes();
     }
 }
