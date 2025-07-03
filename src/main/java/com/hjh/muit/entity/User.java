@@ -2,14 +2,13 @@ package com.hjh.muit.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @ToString
 @NoArgsConstructor
@@ -19,7 +18,7 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String loginId;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false)
@@ -29,24 +28,34 @@ public class User extends BaseEntity {
     private String email;
 
     @Column
-    private String phoneNumber;
+    private String phone;
 
     @Column
     private String address;
 
     @Column
-    private Role role;
+    private String provider;
+
+    @Column
+    private String providerId;
+
+    @Column
+    private LocalDateTime lastLogin;
 
     @Enumerated(EnumType.STRING)
     @Column
-    private Grade grade;
+    private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private UserGrade grade;
 
     @OneToMany(mappedBy = "user")
     @Column
     private List<Order> orders;
 
     @Getter
-    public enum Grade {
+    public enum UserGrade {
 
         BRONZE(3),
         SILVER(5),
@@ -55,12 +64,12 @@ public class User extends BaseEntity {
 
         private final int discountRate;
 
-        Grade(int discountRate) {
+        UserGrade(int discountRate) {
             this.discountRate = discountRate;
         }
     }
 
-    public enum Role {
+    public enum UserRole {
         ADMIN,
         USER
     }

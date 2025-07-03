@@ -7,8 +7,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: #none
 
   devtools:
     restart:
-      enabled: false
+      enabled: #false

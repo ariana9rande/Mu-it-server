@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>이메일 인증 테스트</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 50px auto;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+<h1>이메일 인증 테스트</h1>
+
+<div class="section">
+  <input type="email" id="email" placeholder="이메일 주소 입력" />
+  <button onclick="sendAuthCode()">1단계: 인증번호 전송</button>
+</div>
+
+<div class="section">
+  <input type="text" id="code" placeholder="인증번호 입력 (6자리)" />
+  <button onclick="verifyCode()">2단계: 인증번호 검증</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+  const API_BASE = 'http://localhost:8080/api/auth'; // 필요 시 수정
+
+  async function sendAuthCode() {
+    const email = document.getElementById('email').value;
+    const resultDiv = document.getElementById('result');
+    resultDiv.textContent = '⏳ 인증 코드 전송 중...';
+
+    try {
+      const res = await fetch(`${API_BASE}/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: email
+      });
+
+      const text = await res.text();
+
+      if (res.ok) {
+        resultDiv.textContent = `✅ 인증 코드가 전송되었습니다.\n응답: ${text}`;
+      } else {
+        resultDiv.textContent = `❌ 오류 발생 (HTTP ${res.status})\n${text}`;
+      }
+    } catch (err) {
+      resultDiv.textContent = `🚨 요청 실패: ${err.message}`;
+    }
+  }
+
+  async function verifyCode() {
+    const email = document.getElementById('email').value;
+    const code = document.getElementById('code').value;
+    const resultDiv = document.getElementById('result');
+    resultDiv.textContent = '⏳ 인증번호 검증 중...';
+
+    try {
+      const res = await fetch(`${API_BASE}/email/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          code:  code
+        })
+      });
+
+      const text = await res.text();
+
+      if (res.ok) {
+        resultDiv.textContent = `✅ 인증 성공!\n응답: ${text}`;
+      } else {
+        resultDiv.textContent = `❌ 인증 실패 (HTTP ${res.status})\n${text}`;
+      }
+    } catch (err) {
+      resultDiv.textContent = `🚨 요청 실패: ${err.message}`;
+    }
+  }
+</script>
+</body>
+</html>
