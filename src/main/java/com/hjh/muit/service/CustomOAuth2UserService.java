@@ -1,5 +1,6 @@
 package com.hjh.muit.service;
 
+import com.hjh.muit.config.oauth2.CustomOAuth2User;
 import com.hjh.muit.entity.User;
 import com.hjh.muit.entity.dto.OAuthUserDto;
 import com.hjh.muit.repository.UserRepository;
@@ -19,13 +20,14 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(request);
+        OAuth2User oauth2User = super.loadUser(request);
+        log.info("oauth2User : {}", oauth2User);
 
         String registrationId = request.getClientRegistration().getRegistrationId(); // google, kakao
         log.info("registrationId = {}", registrationId);
@@ -40,28 +42,27 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .getUserNameAttributeName();
         log.info("userNameAttributeName = {}", userNameAttributeName);
 
-        OAuthUserDto dto = OAuthUserDto.of(registrationId, userNameAttributeName, attributes);
-        log.info("dto = {}", dto);
+//        OAuthUserDto dto = OAuthUserDto.of(registrationId, userNameAttributeName, attributes);
+//        log.info("dto = {}", dto);
+//
+//        User user = processOAuthUser(dto);
 
-        User user = processOAuthUser(dto);
-
-        // 필수: OAuth2User 리턴
-        return oauth2User;
+        return new CustomOAuth2User(oauth2User, registrationId);
     }
 
-    public User processOAuthUser(OAuthUserDto dto) {
-        Optional<User> optionalExistingUser = userRepository.findByEmail(dto.getEmail());
-
-        if (optionalExistingUser.isPresent()) {
-            User existingUser = optionalExistingUser.get();
-            if (!existingUser.getProvider().equals(dto.getProvider())) {
-                throw new OAuth2AuthenticationException("다른 방식으로 이미 가입된 이메일입니다.");
-            }
-
-            existingUser.setLastLogin(LocalDateTime.now());
-            return existingUser;
-        }
-
-        return null;
-    }
+//    public User processOAuthUser(OAuthUserDto dto) {
+//        Optional<User> optionalExistingUser = userRepository.findByEmail(dto.getEmail());
+//
+//        if (optionalExistingUser.isPresent()) {
+//            User existingUser = optionalExistingUser.get();
+//            if (!existingUser.getProvider().equals(dto.getProvider())) {
+//                throw new OAuth2AuthenticationException("다른 방식으로 이미 가입된 이메일입니다.");
+//            }
+//
+//            existingUser.setLastLogin(LocalDateTime.now());
+//            return existingUser;
+//        }
+//
+//        throw new OAuth2AuthenticationException("회원가입이 필요합니다.");
+//    }
 }

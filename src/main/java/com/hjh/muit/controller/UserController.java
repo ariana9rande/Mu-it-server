@@ -60,6 +60,10 @@ public class UserController {
         log.info("encodedPassword = {}", encodedPassword);
         dto.setPassword(encodedPassword);
 
+        if (dto.getProvider() == null || dto.getProvider().isBlank()) {
+            dto.setProvider("local");
+        }
+
         User user = userService.createUser(dto);
 
         return ResponseEntity.ok(ApiResponseDto.success("회원가입 성공", user.getLoginId()));

@@ -1,5 +1,6 @@
 package com.hjh.muit.entity.dto;
 
+import com.hjh.muit.enums.UserRole;
 import com.hjh.muit.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class OAuthUserDto {
                 .email(email)
                 .providerId(providerId)
                 .provider(provider)
-                .role(User.UserRole.USER)
+                .role(UserRole.USER)
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.hjh.muit.common.enums;
+package com.hjh.muit.enums;
 
 public enum AuthResult {
     SUCCESS,

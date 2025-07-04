@@ -1,19 +1,25 @@
 package com.hjh.muit.entity;
 
+import com.hjh.muit.enums.UserGrade;
+import com.hjh.muit.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @Builder
-@ToString
+@ToString(exclude = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String loginId;
@@ -54,23 +60,14 @@ public class User extends BaseEntity {
     @Column
     private List<Order> orders;
 
-    @Getter
-    public enum UserGrade {
 
-        BRONZE(3),
-        SILVER(5),
-        GOLD(7),
-        DIAMOND(10);
-
-        private final int discountRate;
-
-        UserGrade(int discountRate) {
-            this.discountRate = discountRate;
-        }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("user"));
     }
 
-    public enum UserRole {
-        ADMIN,
-        USER
+    @Override
+    public String getUsername() {
+        return loginId;
     }
 }

@@ -1,14 +1,12 @@
 package com.hjh.muit.service;
 
+import com.hjh.muit.enums.UserGrade;
+import com.hjh.muit.enums.UserRole;
 import com.hjh.muit.entity.User;
 import com.hjh.muit.entity.dto.SignupRequestDto;
 import com.hjh.muit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +26,14 @@ public class UserService {
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .address(dto.getAddress())
-                .role(User.UserRole.USER)
-                .grade(User.UserGrade.BRONZE)
+                .role(UserRole.USER)
+                .grade(UserGrade.BRONZE)
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
     }
 }
