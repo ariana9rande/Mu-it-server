@@ -4,6 +4,7 @@ import com.hjh.muit.enums.AuthResult;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -16,6 +17,7 @@ import java.time.Duration;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthService {
 
     @Value("${spring.mail.username}")
@@ -30,11 +32,6 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
 
     private final JavaMailSender mailSender;
-
-    public AuthService(StringRedisTemplate redisTemplate, JavaMailSender mailSender) {
-        this.redisTemplate = redisTemplate;
-        this.mailSender = mailSender;
-    }
 
     @PostConstruct
     public void checkRedisConnection() {

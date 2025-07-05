@@ -21,11 +21,19 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TokenProvider {
 
+    public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(7);
+    public static final Duration ACCESS_TOKEN_DURATION = Duration.ofMinutes(30);
+
     private final JwtProperties jwtProperties;
 
-    public String generateToken(User user, Duration expiredAt) {
+    public String generateAccessToken(User user) {
         Date now = new Date();
-        return makeToken(user, new Date(now.getTime() + expiredAt.toMillis()));
+        return makeToken(user, new Date(now.getTime() + ACCESS_TOKEN_DURATION.toMillis()));
+    }
+
+    public String generateRefreshToken(User user) {
+        Date now = new Date();
+        return makeToken(user, new Date(now.getTime() + REFRESH_TOKEN_DURATION.toMillis()));
     }
 
     private String makeToken(User user, Date expiry) {
