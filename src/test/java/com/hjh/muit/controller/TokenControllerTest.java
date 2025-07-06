@@ -3,11 +3,10 @@ package com.hjh.muit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hjh.muit.config.jwt.JwtFactory;
 import com.hjh.muit.config.jwt.JwtProperties;
-import com.hjh.muit.entity.RefreshToken;
 import com.hjh.muit.entity.User;
 import com.hjh.muit.entity.dto.CreateAccessTokenRequest;
-import com.hjh.muit.repository.RefreshTokenRepository;
 import com.hjh.muit.repository.UserRepository;
+import com.hjh.muit.service.RefreshTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ public class TokenControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenService refreshTokenService;
 
     @BeforeEach
     public void mockMvcSetup() {
@@ -59,7 +58,7 @@ public class TokenControllerTest {
     public void createNewAccessToken() throws Exception {
 
         // given
-        final String url = "/api/token";
+        final String url = "/api/token/refresh";
 
         User testUser = userRepository.save(User.builder()
                 .loginId("test_" + UUID.randomUUID())
@@ -72,7 +71,8 @@ public class TokenControllerTest {
                 .build()
                 .createToken(jwtProperties);
 
-        refreshTokenRepository.save(new RefreshToken(testUser.getId(), refreshToken));
+
+        refreshTokenService.saveRefreshToken(testUser.getId(), refreshToken);
 
         CreateAccessTokenRequest request = new CreateAccessTokenRequest();
         request.setRefreshToken(refreshToken);

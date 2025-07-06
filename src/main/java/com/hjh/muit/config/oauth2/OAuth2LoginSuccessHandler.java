@@ -1,14 +1,19 @@
 package com.hjh.muit.config.oauth2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hjh.muit.config.jwt.TokenProvider;
 import com.hjh.muit.entity.User;
+import com.hjh.muit.entity.dto.ApiResponseDto;
 import com.hjh.muit.repository.UserRepository;
+import com.hjh.muit.service.RefreshTokenService;
+import com.hjh.muit.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,6 +23,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +39,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final StringRedisTemplate redisTemplate;
+    private final RefreshTokenService refreshTokenService;
+    private final ObjectMapper objectMapper;
+    private final UserService userService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -52,27 +62,35 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 return;
             }
 
-            String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
-            saveRefreshToken(user.getId(), refreshToken);
-            addRefreshTokenToCookie(request, response, refreshToken);
+            String accessToken = tokenProvider.generateAccessToken(user);
 
-            String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
-            String targetUrl = getTargetUrl(accessToken);
+            String refreshToken = tokenProvider.generateRefreshToken(user);
+            refreshTokenService.saveRefreshToken(user.getId(), refreshToken);
 
-            clearAuthenticationAttributes(request, response);
+            userService.updateLastLogin(user.getId());
 
-            user.setLastLogin(LocalDateTime.now());
-            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("userId", user.getLoginId());
+            dataMap.put("accessToken", accessToken);
+
+            log.info("userId = {}", user.getLoginId());
+            log.info("accessToken = {}", accessToken);
+            log.info("refreshToken = {}", refreshToken);
+
+            response.setContentType("application/json;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getWriter().write(objectMapper.writeValueAsString(ApiResponseDto.success("oauth2 로그인 성공", dataMap)));
         }
 
         if (user == null) {
             //TODO 회원가입 처리
             log.info("회원가입 절차 필요");
-//            getRedirectStrategy().sendRedirect(request, response, "/signup");
-            return;
+
+            response.setContentType("application/json;charset=utf-8");
+
+            response.getWriter().write(objectMapper.writeValueAsString(ApiResponseDto.error("회원가입 필요", HttpStatus.UNAUTHORIZED, email)));
         }
 
-        // 정상 로그인 후 이동
-        super.onAuthenticationSuccess(request, response, authentication);
     }
 }

@@ -30,4 +30,12 @@ public class ApiResponseDto<T> {
                 .data(null)
                 .build();
     }
+
+    public static <T> ApiResponseDto<T> error(String message, HttpStatus status, T data) {
+        return ApiResponseDto.<T>builder()
+                .code(status.value())
+                .message(message)
+                .data(data)
+                .build();
+    }
 }

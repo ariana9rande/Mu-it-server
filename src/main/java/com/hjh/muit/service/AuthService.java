@@ -1,7 +1,6 @@
 package com.hjh.muit.service;
 
 import com.hjh.muit.enums.AuthResult;
-import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +31,6 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
 
     private final JavaMailSender mailSender;
-
-    @PostConstruct
-    public void checkRedisConnection() {
-        redisTemplate.opsForValue().set("confirm:instance", "this");
-    }
 
     // sms/email 인증번호 생성
     public String generateCode() {

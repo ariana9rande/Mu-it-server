@@ -16,8 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
         OAuth2User oauth2User = super.loadUser(request);
@@ -36,27 +34,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .getUserNameAttributeName();
         log.info("userNameAttributeName = {}", userNameAttributeName);
 
-//        OAuthUserDto dto = OAuthUserDto.of(registrationId, userNameAttributeName, attributes);
-//        log.info("dto = {}", dto);
-//
-//        User user = processOAuthUser(dto);
-
         return new CustomOAuth2User(oauth2User, registrationId);
     }
-
-//    public User processOAuthUser(OAuthUserDto dto) {
-//        Optional<User> optionalExistingUser = userRepository.findByEmail(dto.getEmail());
-//
-//        if (optionalExistingUser.isPresent()) {
-//            User existingUser = optionalExistingUser.get();
-//            if (!existingUser.getProvider().equals(dto.getProvider())) {
-//                throw new OAuth2AuthenticationException("다른 방식으로 이미 가입된 이메일입니다.");
-//            }
-//
-//            existingUser.setLastLogin(LocalDateTime.now());
-//            return existingUser;
-//        }
-//
-//        throw new OAuth2AuthenticationException("회원가입이 필요합니다.");
-//    }
 }

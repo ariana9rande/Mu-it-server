@@ -5,8 +5,11 @@ import com.hjh.muit.enums.UserRole;
 import com.hjh.muit.entity.User;
 import com.hjh.muit.entity.dto.SignupRequestDto;
 import com.hjh.muit.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +38,12 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+    }
+
+    @Transactional
+    public void updateLastLogin(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+
+        user.setLastLogin(LocalDateTime.now());
     }
 }

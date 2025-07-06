@@ -7,6 +7,7 @@ import com.hjh.muit.entity.dto.LoginRequestDto;
 import com.hjh.muit.entity.dto.SignupRequestDto;
 import com.hjh.muit.repository.UserRepository;
 import com.hjh.muit.service.AuthService;
+import com.hjh.muit.service.RefreshTokenService;
 import com.hjh.muit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,6 +36,7 @@ public class BaseController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입 요청", requestBody = @RequestBody(description = "회원가입 정보",
@@ -88,10 +90,18 @@ public class BaseController {
         Map<String, String> dataMap = new HashMap<>();
 
         if (user.isPresent() && passwordEncoder.matches(dto.getPassword(), user.get().getPassword())) {
-            String token = tokenProvider.generateToken(user.get(), Duration.ofHours(2));
+            String accessToken = tokenProvider.generateAccessToken(user.get());
+            String refreshToken = tokenProvider.generateRefreshToken(user.get());
+            refreshTokenService.saveRefreshToken(user.get().getId(), refreshToken);
+
+            userService.updateLastLogin(user.get().getId());
 
             dataMap.put("userId", user.get().getLoginId());
-            dataMap.put("accessToken", token);
+            dataMap.put("accessToken", accessToken);
+
+            log.info("userId = {}", user.get().getLoginId());
+            log.info("accessToken = {}", accessToken);
+            log.info("refreshToken = {}", refreshToken);
 
             return ResponseEntity.ok(ApiResponseDto.success("로그인 성공", dataMap));
         }
