@@ -1,26 +1,22 @@
 package com.hjh.muit.service;
 
-import com.hjh.muit.common.enums.AuthResult;
-import jakarta.annotation.PostConstruct;
+import com.hjh.muit.enums.AuthResult;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Duration;
-import java.util.Arrays;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthService {
 
     @Value("${spring.mail.username}")
@@ -35,16 +31,6 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
 
     private final JavaMailSender mailSender;
-
-    public AuthService(StringRedisTemplate redisTemplate, JavaMailSender mailSender) {
-        this.redisTemplate = redisTemplate;
-        this.mailSender = mailSender;
-    }
-
-    @PostConstruct
-    public void checkRedisConnection() {
-        redisTemplate.opsForValue().set("confirm:instance", "this");
-    }
 
     // sms/email 인증번호 생성
     public String generateCode() {
