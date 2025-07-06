@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -49,9 +50,25 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
 //        log.info("principal = {}", authentication.getPrincipal());
 
-        String email = oauthUser.getAttribute("email");
+        String email = "";
+
+        if (oauthUser.getProvider().equals("kakao")) {
+            Map<String, Object> kakaoAccount = oauthUser.getAttribute("kakao_account");
+            email = (String) kakaoAccount.get("email");
+        }
+
+        if (oauthUser.getProvider().equals("google")) {
+            email = oauthUser.getAttribute("email");
+        }
+
 //        log.info("email = {}", email);
-        User user = userRepository.findByEmail(email).orElse(null);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+//        log.info("optionalUser: {}", optionalUser);
+        User user = null;
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        }
 //        log.info("user = {}", user);
 
 
