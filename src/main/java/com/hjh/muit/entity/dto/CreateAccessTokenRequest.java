@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class CreateAccessTokenRequest {
 
-    @Schema(description = "refresh token", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJoamg5NzA0MjJAZ21haWwuY29tIiwiaWF0IjoxNzUxNzkyMjIwLCJleHAiOjE3NTIzOTcwMjAsInN1YiI6ImhqaDk3MDQyMkBnbWFpbC5jb20iLCJpZCI6MX0.Vc3iJURkxOWpvfYejG3RHzhmZ2QTrZbWr8Z7b3OH8Ig")
+    @Schema(description = "refresh token", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
     private String refreshToken;
 }
